@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_figures" default="compile.module.figures">
+  <dirname property="module.figures.basedir" file="${ant.file.module_figures}"/>
+  
+  <property name="module.jdk.home.figures" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.figures" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.figures" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.figures" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+  
+  <property name="figures.output.dir" value="${module.figures.basedir}/out/production/Figures"/>
+  <property name="figures.testoutput.dir" value="${module.figures.basedir}/out/test/Figures"/>
+  
+  <path id="figures.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="figures.module.production.classpath">
+    <path refid="${module.jdk.classpath.figures}"/>
+  </path>
+  
+  <path id="figures.runtime.production.module.classpath">
+    <pathelement location="${figures.output.dir}"/>
+  </path>
+  
+  <path id="figures.module.classpath">
+    <path refid="${module.jdk.classpath.figures}"/>
+    <pathelement location="${figures.output.dir}"/>
+  </path>
+  
+  <path id="figures.runtime.module.classpath">
+    <pathelement location="${figures.testoutput.dir}"/>
+    <pathelement location="${figures.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.figures">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.figures">
+    <patternset refid="excluded.from.module.figures"/>
+  </patternset>
+  
+  <path id="figures.module.sourcepath">
+    <dirset dir="${module.figures.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.figures" depends="compile.module.figures.production,compile.module.figures.tests" description="Compile module Figures"/>
+  
+  <target name="compile.module.figures.production" depends="register.custom.compilers" description="Compile module Figures; production classes">
+    <mkdir dir="${figures.output.dir}"/>
+    <javac2 destdir="${figures.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.figures}/javac">
+      <compilerarg line="${compiler.args.figures}"/>
+      <bootclasspath refid="figures.module.bootclasspath"/>
+      <classpath refid="figures.module.production.classpath"/>
+      <src refid="figures.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.figures"/>
+    </javac2>
+    
+    <copy todir="${figures.output.dir}">
+      <fileset dir="${module.figures.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.figures.tests" depends="register.custom.compilers,compile.module.figures.production" description="compile module Figures; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.figures" description="cleanup module">
+    <delete dir="${figures.output.dir}"/>
+    <delete dir="${figures.testoutput.dir}"/>
+  </target>
+</project>
